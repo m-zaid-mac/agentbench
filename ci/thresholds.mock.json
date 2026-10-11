@@ -1,0 +1,11 @@
+{
+  "_note": "Thresholds for the offline mock agent; this job checks the harness itself works end to end.",
+  "min": {
+    "success_rate": 1.0,
+    "numeric_fidelity": 0.95
+  },
+  "max": {
+    "phantom_rate": 0.0,
+    "search_error_rate": 0.0
+  }
+}

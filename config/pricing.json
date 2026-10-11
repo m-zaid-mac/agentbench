@@ -1,0 +1,9 @@
+{
+  "_note": "USD per million tokens. Fill in from the AWS Bedrock pricing page for your region and model; models left null report cost as n/a instead of a wrong number.",
+  "models": {
+    "us.anthropic.claude-sonnet-4-5-20250929-v1:0": {
+      "input_per_mtok": 3.0,
+      "output_per_mtok": 15.0
+    }
+  }
+}

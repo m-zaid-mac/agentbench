@@ -1,0 +1,61 @@
+name: eval
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  harness:
+    # Unit tests plus an offline end-to-end run. No secrets needed.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -e ".[dev]"
+      - run: python -m pytest -q
+      - run: python -m agentbench --db results/ci.db run --agent mock --trials 2 > /dev/null
+      - run: python -m agentbench --db results/ci.db ci-check --thresholds ci/thresholds.mock.json
+
+  agent-smoke:
+    # Real agent on the smoke subset with replayed search (committed cache) and a live judge.
+    # Skips cleanly until you add the AWS_ROLE_ARN secret and an OIDC role for Bedrock.
+    needs: harness
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      HAS_AWS: ${{ secrets.AWS_ROLE_ARN != '' }}
+      JUDGE_MODEL: ${{ vars.JUDGE_MODEL }}
+    steps:
+      - uses: actions/checkout@v4
+      - if: env.HAS_AWS == 'true'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+      - if: env.HAS_AWS == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - if: env.HAS_AWS == 'true'
+        # TODO: also install your agent package here, e.g. pip install -e ../research-agent
+        run: pip install -e ".[live]"
+      - if: env.HAS_AWS == 'true'
+        run: |
+          python -m agentbench --db results/ci.db run \
+            --agent agentbench.adapters.research_agent:ResearchAgentAdapter \
+            --variant ci-smoke --tags smoke --trials 1 \
+            --search tavily --search-mode replay --fuzzy-replay 0.75 \
+            --judge "bedrock:${JUDGE_MODEL}" --report-out reports/ci-smoke.md > /dev/null
+          python -m agentbench --db results/ci.db ci-check --run latest \
+            --thresholds ci/thresholds.agent.json --baseline ci/baseline.json
+      - if: always() && env.HAS_AWS == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-report
+          path: reports/
+      - if: env.HAS_AWS != 'true'
+        run: echo "AWS_ROLE_ARN secret not set; skipping real-agent smoke eval."

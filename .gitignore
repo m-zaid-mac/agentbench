@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.env
+results/
+reports/
+labels/
+eval_cache/judge/
+*.egg-info/
+
+.venv/
+.DS_Store
+eval_cache/search/*
+!eval_cache/search/.gitkeep

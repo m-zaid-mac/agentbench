@@ -1,0 +1,17 @@
+{
+  "_note": "Thresholds for the real agent's smoke run. Set 'min' values a little under your measured baseline, then tighten.",
+  "min": {
+    "success_rate": 1.0,
+    "fact_recall": 0.0,
+    "faithfulness": 0.0
+  },
+  "max": {
+    "phantom_rate": 0.0,
+    "search_error_rate": 0.0
+  },
+  "max_drop": {
+    "fact_recall": 0.1,
+    "faithfulness": 0.1,
+    "numeric_fidelity": 0.1
+  }
+}

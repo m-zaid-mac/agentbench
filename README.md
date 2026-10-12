@@ -2,7 +2,7 @@
 
 An evaluation harness for LLM research agents. It runs an agent against a fixed task set, scores the final reports and the path the agent took to produce them, and tells you whether a change to prompts, models, or graph structure actually made things better, with confidence intervals rather than vibes.
 
-Built to evaluate my [Autonomous AI Research Agent](https://github.com/YOUR_GITHUB_USERNAME/research-agent) (LangGraph, AWS Bedrock, Tavily). Any agent that implements one async method can plug in.
+Built to evaluate my [Autonomous AI Research Agent](https://github.com/m-zaid-mac/research-agent) (LangGraph, AWS Bedrock, Tavily). Any agent that implements one async method can plug in.
 
 ```bash
 make demo-bugs     # offline demo with a mock agent: no API keys, about 5 seconds
